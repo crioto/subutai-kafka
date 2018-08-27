@@ -1,0 +1,18 @@
+# Apache Kafka Broekr
+
+[Unit]
+Description=Apache Kafka Broker
+Documentation=http://kafka.apache.org/documentation.html
+Requires=network.target remote-fs.target apache-zookeeper.service
+After=network.target remote-fs.target apache-zookeeper.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
+ExecStop=/usr/local/kafka/bin/kafka-server-stop.sh
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target

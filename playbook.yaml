@@ -1,0 +1,52 @@
+---
+- hosts: all
+  remote_user: root
+  gather_facts: false
+  tasks:
+    - name: Install JDK
+      apt: 
+        name: default-jdk
+        state: latest
+    - name: Download Apache Kafka
+      get_url:
+        url: http://www-eu.apache.org/dist/kafka/2.0.0/kafka_2.12-2.0.0.tgz
+        dest: /tmp/kafka.tar.gz
+    - name: Create kafka directory
+      file:
+        path: /usr/local/kafka
+        state: directory
+    - name: Unarchive Kafka
+      unarchive:
+        src: /tmp/kafka.tar.gz
+        remote_src: yes
+        dest: /usr/local/kafka
+        extra_opts: [--strip-components=1]
+    - name: Copy Zookeeper systemd unit file
+      copy:
+        src: files/apache-zookeeper.service
+        dest: /etc/systemd/system/apache-zookeeper.service
+        mode: 0755
+    - name: Copy Broker systemd unit file
+      copy:
+        src: files/apache-kafka.service
+        dest: /etc/systemd/system/apache-kafka.service
+        mode: 0755
+    - name: Enable Zookeper Service
+      systemd:
+        name: apache-zookeeper.service
+        daemon_reload: yes
+        enabled: yes  
+        state: started
+    - name: Enable Broker Service
+      systemd:
+        name: apache-kafka.service
+        daemon_reload: yes
+        enabled: yes  
+        state: started
+    - name: Copy run-topics.sh script
+      copy:
+        src: files/run-topics.sh
+        dest: /usr/local/kafka/bin/run-topics.sh
+        mode: 0755
+    - name: Run topics
+      shell: /usr/local/kafka/bin/run-topics.sh {{ topics }}

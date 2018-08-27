@@ -1,0 +1,81 @@
+{
+    "name": "${environmentName}",
+    "description": "Apache Kafka Cluster",
+    "version": "1.0.0",
+    "author": "https://github.com/crioto",
+    "containers": [
+        {
+            "hostname": "${containerName}",
+            "template": "debian-stretch",
+            "peer-criteria": "HTTP-GROUP",
+            "size": "${containerSize}",
+            "port-mapping": [
+                {
+                    "protocol": "tcp",
+                    "domain": "${domainName}",
+                    "internal-port": "8085",
+                    "external-port": "8085"
+                }
+            ]
+        }
+    ],
+    "peer-criteria": [
+        {
+            "name": "HTTP-GROUP"
+        }
+    ],
+    "ansible-configuration": {
+        "source-url": "https://github.com/crioto/subutai-kafka/archive/master.zip",
+        "ansible-playbook": "playbook.yaml",
+        "extra-vars": [
+            {
+                "key": "domain_name",
+                "value": "${domainName}"
+            },
+            {
+                "key": "topicList",
+                "value": "${topicList}"
+            }
+        ],
+        "groups": [
+            {
+                "name": "kafka",
+                "hostnames": [
+                    "${containerName}"
+                ]
+            }
+        ]
+    },
+    "user-variables": {
+        "environmentName": {
+            "description": "Enter the environment name",
+            "type": "string",
+            "default": "ApacheKafka",
+            "validation": "[a-zA-Z0-9]+"
+        },
+        "domainName": {
+            "description": "Enter the application domain name",
+            "type": "domain",
+            "default": "example.com",
+            "validation": "[a-zA-Z0-9]+"
+        },
+        "containerName": {
+            "description": "Enter the container's hostname",
+            "type": "string",
+            "default": "kafka",
+            "validation": "[a-zA-Z0-9]+"
+        },
+        "topicList": {
+            "description": "Comma-separated list of topics",
+            "type": "string",
+            "default": "subutai-topic",
+            "validation": "(\\d+)(,\\s*\\d+)*"
+        },
+        "containerSize": {
+            "description": "Container Size",
+            "type": "enum",
+            "default": "SMALL",
+            "validation": "TINY,SMALL,MEDIUM,LARGE,HUGE"
+        }
+    }
+}
