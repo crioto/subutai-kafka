@@ -49,4 +49,4 @@
         dest: /usr/local/kafka/bin/run-topics.sh
         mode: 0755
     - name: Run topics
-      shell: /usr/local/kafka/bin/run-topics.sh {{ topics }}
+      shell: /usr/local/kafka/bin/run-topics.sh {{ topicList }}
